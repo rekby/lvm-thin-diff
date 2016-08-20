@@ -378,7 +378,36 @@ func TestCutHead(t *testing.T){
 }
 
 func TestMakePatch(t *testing.T){
-	t.Error("TODO")
+	var diff, expectedDiff dataPatch
+
+	diff = makePatch(dataBlock{}, dataBlock{})
+	if diff != expectedDiff {
+		t.Errorf("%#v", diff)
+	}
+
+	expectedDiff = dataPatch{Offset:100, Length: 50, Operation:DELETE}
+	diff = makePatch(dataBlock{OriginOffset:100, DataOffset:200, Length:50}, dataBlock{})
+	if diff != expectedDiff {
+		t.Errorf("%#v", diff)
+	}
+
+	expectedDiff = dataPatch{Offset:100, Length: 50, Operation:WRITE}
+	diff = makePatch(dataBlock{}, dataBlock{OriginOffset:100, DataOffset:200, Length:50})
+	if diff != expectedDiff {
+		t.Errorf("%#v", diff)
+	}
+
+	expectedDiff = dataPatch{Operation:NONE}
+	diff = makePatch(dataBlock{OriginOffset:100, DataOffset:200, Length:50}, dataBlock{OriginOffset:100, DataOffset:200, Length:50})
+	if diff != expectedDiff {
+		t.Errorf("%#v", diff)
+	}
+
+	expectedDiff = dataPatch{Operation:WRITE, Offset:100, Length: 50}
+	diff = makePatch(dataBlock{OriginOffset:100, DataOffset:500, Length:50}, dataBlock{OriginOffset:100, DataOffset:200, Length:50})
+	if diff != expectedDiff {
+		t.Errorf("%#v", diff)
+	}
 }
 
 func TestSplit(t *testing.T){

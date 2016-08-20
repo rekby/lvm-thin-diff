@@ -207,7 +207,7 @@ func makePatch(bFrom, bTo dataBlock) dataPatch {
 	}
 
 	if bTo.IsEmpty() {
-		return dataPatch{Offset:bFrom.OriginOffset, Operation:DELETE, Length:bFrom.DataOffset}
+		return dataPatch{Offset:bFrom.OriginOffset, Operation:DELETE, Length:bFrom.Length}
 	}
 
 	if bFrom.OriginOffset != bTo.OriginOffset || bFrom.Length != bTo.Length {
