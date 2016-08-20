@@ -5,25 +5,25 @@ import (
 	"sort"
 )
 
-type Block struct {
+type dataBlock struct {
 	OriginOffset int64
 	DataOffset   int64
 	Length       int64
 }
 
-func (this *Block) IsEmpty() bool {
+func (this *dataBlock) IsEmpty() bool {
 	if this == nil {
 		return true
 	}
-	return *this == Block{}
+	return *this == dataBlock{}
 }
 
 // Offset for next then last byte of origin data
-func (this *Block) OriginLast() int64 {
+func (this *dataBlock) OriginLast() int64 {
 	return this.OriginOffset + this.Length
 }
 
-func (this *Block) Split(length int64) (left, right Block) {
+func (this *dataBlock) Split(length int64) (left, right dataBlock) {
 	if length >= this.Length {
 		left = *this
 	} else {
@@ -38,9 +38,9 @@ func (this *Block) Split(length int64) (left, right Block) {
 	return left, right
 }
 
-type Device struct {
+type dataDevice struct {
 	Id     int
-	Blocks BlockArr
+	Blocks blockArr
 	Size   int64
 }
 
@@ -52,25 +52,25 @@ const (
 	SET_SIZE
 )
 
-type Diff struct {
+type dataPatch struct {
 	Operation int
 	Offset    int64
 	Length    int64
 }
 
-type BlockArr []Block
+type blockArr []dataBlock
 
-var _ sort.Interface = BlockArr{}
+var _ sort.Interface = blockArr{}
 
-func (arr BlockArr) Len() int {
+func (arr blockArr) Len() int {
 	return len(arr)
 }
 
-func (arr BlockArr) Less(i, j int) bool {
+func (arr blockArr) Less(i, j int) bool {
 	return arr[i].DataOffset < arr[j].DataOffset
 }
 
-func (arr BlockArr) Swap(i, j int) {
+func (arr blockArr) Swap(i, j int) {
 	tmp := arr[i]
 	arr[i] = arr[j]
 	arr[j] = tmp
@@ -83,8 +83,8 @@ func (arr BlockArr) Swap(i, j int) {
 Если оба блока данных не пустые, то их логические смещения (OriginOffset) и длины - совпадают.
 ВАЖНО - From и To портятся в процессе работы.
 */
-type DataBlockArrHeadCutter struct {
-	From, To BlockArr // Рабочие массивы, отсортированы по Originffset. ВАЖНО - портятся в процессе работы.
+type dataBlockArrCutter struct {
+	From, To blockArr // Рабочие массивы, отсортированы по Originffset. ВАЖНО - портятся в процессе работы.
 }
 
 /*
@@ -97,7 +97,7 @@ type DataBlockArrHeadCutter struct {
 Если from и to начинаются в разных местах, но перекрываются - возвращает кусок данных. Который начинается раньше и длиной до начала
         блока данных второго массива. Чтобы при следующем вызове вернуться в ситуацию, когда массивы начинаются по одному смешению.
 */
-func (this *DataBlockArrHeadCutter) Cut() (ok bool, bFrom, bTo Block) {
+func (this *dataBlockArrCutter) Cut() (ok bool, bFrom, bTo dataBlock) {
 	switch {
 	case len(this.From) == 0 && len(this.To) == 0:
 		return // возвращаем пустые данные
@@ -188,4 +188,35 @@ func (this *DataBlockArrHeadCutter) Cut() (ok bool, bFrom, bTo Block) {
 	default:
 		panic(fmt.Errorf("Unhandled variant in cutHead: %#v %#v", *firstFrom, *firstTo))
 	}
+}
+
+/*
+Создать команду для патча данных from так чтобы получились данные to.
+bFrom и bTo - два блока данных. Если оба блока не пустые - то они должны начинаться с одного логического смещения и
+быть равной длины.
+
+Пустой блок означает что в месте, указанном вторым блоком данных нет.
+ */
+func makePatch(bFrom, bTo dataBlock) dataPatch {
+	if bFrom.IsEmpty() && bTo.IsEmpty() {
+		return dataPatch{Operation:NONE}
+	}
+
+	if bFrom.IsEmpty() {
+		return dataPatch{Offset:bTo.OriginOffset, Operation:WRITE, Length: bTo.Length}
+	}
+
+	if bTo.IsEmpty() {
+		return dataPatch{Offset:bFrom.OriginOffset, Operation:DELETE, Length:bFrom.DataOffset}
+	}
+
+	if bFrom.OriginOffset != bTo.OriginOffset || bFrom.Length != bTo.Length {
+		panic("bFrom and bTo must have same start and length")
+	}
+
+	if bFrom.DataOffset == bTo.DataOffset {
+		return dataPatch{Operation:NONE} // Data is equal. Do nothing.
+	}
+
+	return dataPatch{Offset:bTo.OriginOffset, Operation:WRITE, Length: bTo.Length}
 }

@@ -32,7 +32,7 @@ func TestParser(t *testing.T){
 `
 	const blockSize = 128*512
 
-	res, err := Parse(bytes.NewBufferString(data))
+	res, err := parseMetaDataXML(bytes.NewBufferString(data))
 	if err != nil {
 		t.Error(err)
 	}
@@ -49,22 +49,22 @@ func TestParser(t *testing.T){
 		t.Error()
 	}
 
-	b := Block{OriginOffset:0, DataOffset:0, Length: blockSize}
+	b := dataBlock{OriginOffset:0, DataOffset:0, Length: blockSize}
 	if dev.Blocks[0] != b {
 		t.Error()
 	}
 
-	b = Block{OriginOffset:8190976*blockSize, DataOffset:8461326*blockSize, Length: 80*blockSize}
+	b = dataBlock{OriginOffset:8190976*blockSize, DataOffset:8461326*blockSize, Length: 80*blockSize}
 	if dev.Blocks[1] != b {
 		t.Error()
 	}
 
-	b = Block{OriginOffset:8191056*blockSize, DataOffset:8461529*blockSize, Length:9*blockSize}
+	b = dataBlock{OriginOffset:8191056*blockSize, DataOffset:8461529*blockSize, Length:9*blockSize}
 	if dev.Blocks[2] != b {
 		t.Error()
 	}
 
-	b = Block{OriginOffset:8191999*blockSize, DataOffset:4146006*blockSize, Length:blockSize}
+	b = dataBlock{OriginOffset:8191999*blockSize, DataOffset:4146006*blockSize, Length:blockSize}
 	if dev.Blocks[3] != b {
 		t.Error()
 	}

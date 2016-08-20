@@ -9,12 +9,10 @@ import (
 
 const sectorSize = 512 // bytes in sector
 
-// Offset/length in bytes
-
-func Parse(reader io.Reader) ([]Device, error) {
-	arr := []Device{}
+func parseMetaDataXML(reader io.Reader) ([]dataDevice, error) {
+	arr := []dataDevice{}
 	xmlReader := xml.NewDecoder(reader)
-	var dev *Device
+	var dev *dataDevice
 	var blockSize int64 = 0
 	for {
 		token, err := xmlReader.Token()
@@ -31,14 +29,14 @@ func Parse(reader io.Reader) ([]Device, error) {
 				}
 				blockSize *= sectorSize
 			case "device":
-				arr = append(arr, Device{})
+				arr = append(arr, dataDevice{})
 				dev = &arr[len(arr)-1]
 				dev.Id, err = strconv.Atoi(getAttr(t.Attr, "dev_id"))
 				if err != nil {
 					return arr, errors.New("Can't parse device id: " + getAttr(t.Attr, "dev_id"))
 				}
 			case "single_mapping":
-				dev.Blocks = append(dev.Blocks, Block{Length:blockSize})
+				dev.Blocks = append(dev.Blocks, dataBlock{Length:blockSize})
 				block := &dev.Blocks[len(dev.Blocks)-1]
 				block.OriginOffset, err = strconv.ParseInt(getAttr(t.Attr, "origin_block"), 10, 64)
 				block.OriginOffset *= blockSize
@@ -52,7 +50,7 @@ func Parse(reader io.Reader) ([]Device, error) {
 				}
 
 			case "range_mapping":
-				dev.Blocks = append(dev.Blocks, Block{})
+				dev.Blocks = append(dev.Blocks, dataBlock{})
 				block := &dev.Blocks[len(dev.Blocks)-1]
 				block.OriginOffset, err = strconv.ParseInt(getAttr(t.Attr, "origin_begin"), 10, 64)
 				block.OriginOffset *= blockSize
