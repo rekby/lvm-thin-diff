@@ -10,16 +10,6 @@ import (
 const sectorSize = 512 // bytes in sector
 
 // Offset/length in bytes
-type Block struct {
-	OriginOffset int64
-	DataOffset   int64
-	Length       int64
-}
-
-type Device struct {
-	Id     int
-	Blocks []Block
-}
 
 func Parse(reader io.Reader) ([]Device, error) {
 	arr := []Device{}
