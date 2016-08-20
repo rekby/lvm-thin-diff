@@ -3,7 +3,7 @@ package lvm_thin_diff
 import "testing"
 
 func TestCutHead(t *testing.T){
-	var data DataBlockCutter
+	var data DataBlockArrHeadCutter
 	var bFrom, bTo, expectedBFrom, expectedBTo Block
 	var expectedFromArr, expectedToArr BlockArr
 	var ok, expectedOk bool
@@ -54,7 +54,7 @@ func TestCutHead(t *testing.T){
 	// EmptyFrom
 	// FROM:
 	// TO:   DDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		To:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -72,7 +72,7 @@ func TestCutHead(t *testing.T){
 	}
 
 	// EmptyTo
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -91,7 +91,7 @@ func TestCutHead(t *testing.T){
 
 
 	// firstFrom empty
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:10,DataOffset:20,Length:0},
 			Block{OriginOffset:100,DataOffset:200,Length:300},
@@ -118,7 +118,7 @@ func TestCutHead(t *testing.T){
 	// firstTo empty
 	// FROM: DDDDDDDD
 	// TO:
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -145,7 +145,7 @@ func TestCutHead(t *testing.T){
 	// firstFrom end before firstTo start 1 (have space between blocks)
 	// FROM: DDDDDDDD
 	// TO:                 DDDDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -170,7 +170,7 @@ func TestCutHead(t *testing.T){
 	// firstFrom end before firstTo start 2 (have no space between blocks)
 	// FROM: DDDDDDDD
 	// TO:           DDDDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -195,7 +195,7 @@ func TestCutHead(t *testing.T){
 	// firstTo end before firstFrom start 1 (have space between blocks)
 	// FROM:               DDDDDDDDDD
 	// TO:   DDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:800,DataOffset:550,Length:600},
 		},
@@ -220,7 +220,7 @@ func TestCutHead(t *testing.T){
 	// firstTo end before firstFrom start 2 (have no space between blocks)
 	// FROM:         DDDDDDDDDD
 	// TO:   DDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:400,DataOffset:550,Length:600},
 		},
@@ -246,7 +246,7 @@ func TestCutHead(t *testing.T){
 	// firstFrom start before firstTo. Overlap.
 	// FROM: DDDDDDD
 	// TO:       DDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -272,7 +272,7 @@ func TestCutHead(t *testing.T){
 	// firstTo start before firstFrom. Overlap.
 	// FROM:     DDDDDDD
 	// TO:   DDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:250,DataOffset:550,Length:600},
 		},
@@ -298,7 +298,7 @@ func TestCutHead(t *testing.T){
 	// Equal start. firstFrom shorter then firstTo
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:550,Length:200},
 			Block{OriginOffset:300,DataOffset:550,Length:250},
@@ -325,7 +325,7 @@ func TestCutHead(t *testing.T){
 	// Equal start. firstTo shorter then firstFrom
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:300},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
@@ -353,7 +353,7 @@ func TestCutHead(t *testing.T){
 	// Equal start. firstTo equal length to firstFrom
 	// FROM:  DDDDD
 	// TO:    DDDDD
-	data = DataBlockCutter{
+	data = DataBlockArrHeadCutter{
 		From:BlockArr{
 			Block{OriginOffset:100,DataOffset:200,Length:200},
 			Block{OriginOffset:400,DataOffset:500,Length:600},
