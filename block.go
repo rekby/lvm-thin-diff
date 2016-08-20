@@ -134,47 +134,56 @@ func (this *DataBlockCutter) Cut() (ok bool, bFrom, bTo Block) {
 		this.From = this.From[1:]
 		return this.Cut()
 	case firstTo.Length == 0:
+		// firstTo empty
 		this.To = this.To[1:]
 		return this.Cut()
 
 	case firstFrom.OriginLast() <= firstTo.OriginOffset:
+		// firstFrom end before firstTo start
 		ok = true
 		bFrom = *firstFrom
 		this.From = this.From[1:]
 		return
 	case firstTo.OriginLast() <= firstFrom.OriginOffset:
+		// firstTo end before firstFromStart
 		ok = true
 		bTo = *firstTo
 		this.To = this.To[1:]
 		return
 
 	case firstFrom.OriginOffset < firstTo.OriginOffset:
+		// firstFrom start before firstTo. Overlap.
 		ok = true
 		length := firstTo.OriginOffset - firstFrom.OriginOffset
 		bFrom, *firstFrom = firstFrom.Split(length)
 		return
 
 	case firstTo.OriginOffset < firstFrom.OriginOffset:
+		// firstTo start before firstFrom. Overlap
 		ok = true
-		length := bFrom.OriginOffset - bTo.OriginOffset
-		bTo, *firstTo = bTo.Split(length)
+		length := firstFrom.OriginOffset - firstTo.OriginOffset
+		bTo, *firstTo = firstTo.Split(length)
 		return
 
 	case firstFrom.OriginOffset == firstTo.OriginOffset:
+		// Equal start
 		switch {
 		case firstFrom.Length < firstTo.Length:
+			// firstFrom shorter then firstTo
 			ok = true
 			bFrom = *firstFrom
 			this.From = this.From[1:]
 			bTo, *firstTo = firstTo.Split(firstFrom.Length)
 			return
 		case firstTo.Length < firstFrom.Length:
+			// firstTo shorter then firstFrom
 			ok = true
 			bTo = *firstTo
 			this.To = this.To[1:]
 			bFrom, *firstFrom = firstFrom.Split(firstTo.Length)
 			return
 		case firstTo.Length == firstFrom.Length:
+			// firstTo equal length to firstFrom
 			ok = true
 			bFrom = *firstFrom
 			bTo = *firstTo
