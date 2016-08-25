@@ -34,12 +34,12 @@ func TestCutHead(t *testing.T){
 			t.Errorf("bTo: %#v != %#v", bTo, expectedBTo)
 			res = false
 		}
-		if !equals(data.From, expectedFromArr) {
-			t.Errorf("newFrom: %#v != %#v", data.From, expectedFromArr)
+		if !equals(data.from, expectedFromArr) {
+			t.Errorf("newFrom: %#v != %#v", data.from, expectedFromArr)
 			res = false
 		}
-		if !equals(data.To, expectedToArr) {
-			t.Errorf("newTo: %#v != %#v", data.To, expectedToArr)
+		if !equals(data.to, expectedToArr) {
+			t.Errorf("newTo: %#v != %#v", data.to, expectedToArr)
 			res = false
 		}
 		return res
@@ -55,7 +55,7 @@ func TestCutHead(t *testing.T){
 	// FROM:
 	// TO:   DDDDDDDD
 	data = dataBlockArrCutter{
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -73,7 +73,7 @@ func TestCutHead(t *testing.T){
 
 	// EmptyTo
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -92,12 +92,12 @@ func TestCutHead(t *testing.T){
 
 	// firstFrom empty
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:10,DataOffset:20,Length:0},
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:250,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:550,Length:600},
 		},
@@ -119,11 +119,11 @@ func TestCutHead(t *testing.T){
 	// FROM: DDDDDDDD
 	// TO:
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:10,DataOffset:20,Length:0},
 			dataBlock{OriginOffset:100,DataOffset:250,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:550,Length:600},
@@ -146,11 +146,11 @@ func TestCutHead(t *testing.T){
 	// FROM: DDDDDDDD
 	// TO:                 DDDDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:800,DataOffset:550,Length:600},
 		},
 	}
@@ -171,11 +171,11 @@ func TestCutHead(t *testing.T){
 	// FROM: DDDDDDDD
 	// TO:           DDDDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:400,DataOffset:550,Length:600},
 		},
 	}
@@ -196,10 +196,10 @@ func TestCutHead(t *testing.T){
 	// FROM:               DDDDDDDDDD
 	// TO:   DDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:800,DataOffset:550,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -221,10 +221,10 @@ func TestCutHead(t *testing.T){
 	// FROM:         DDDDDDDDDD
 	// TO:   DDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:400,DataOffset:550,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -247,11 +247,11 @@ func TestCutHead(t *testing.T){
 	// FROM: DDDDDDD
 	// TO:       DDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:250,DataOffset:550,Length:600},
 		},
 	}
@@ -273,10 +273,10 @@ func TestCutHead(t *testing.T){
 	// FROM:     DDDDDDD
 	// TO:   DDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:250,DataOffset:550,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -299,11 +299,11 @@ func TestCutHead(t *testing.T){
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
 			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
@@ -326,11 +326,11 @@ func TestCutHead(t *testing.T){
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
 			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
 		},
@@ -354,11 +354,11 @@ func TestCutHead(t *testing.T){
 	// FROM:  DDDDD
 	// TO:    DDDDD
 	data = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:200},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
 			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
 		},
@@ -412,12 +412,12 @@ func TestNewDataBlockArrCutter(t *testing.T){
 			t.Errorf("bTo: %#v != %#v", bTo, expectedBTo)
 			res = false
 		}
-		if !equals(dataOrig.From, expectedFromArr) {
-			t.Errorf("newFrom: %#v != %#v", dataOrig.From, expectedFromArr)
+		if !equals(dataOrig.from, expectedFromArr) {
+			t.Errorf("newFrom: %#v != %#v", dataOrig.from, expectedFromArr)
 			res = false
 		}
-		if !equals(dataOrig.To, expectedToArr) {
-			t.Errorf("newTo: %#v != %#v", dataOrig.To, expectedToArr)
+		if !equals(dataOrig.to, expectedToArr) {
+			t.Errorf("newTo: %#v != %#v", dataOrig.to, expectedToArr)
 			res = false
 		}
 		return res
@@ -433,16 +433,16 @@ func TestNewDataBlockArrCutter(t *testing.T){
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
 	dataOrig = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
 			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
 	}
-	data = newDataBlockArrCutter(dataOrig.From, dataOrig.To)
+	data = newDataBlockArrCutter(dataOrig.from, dataOrig.to)
 	expectedBFrom = dataBlock{OriginOffset:100,DataOffset:550,Length:200}
 	expectedBTo = dataBlock{OriginOffset:100,DataOffset:200,Length:200}
 	expectedFromArr = blockArr{
@@ -463,16 +463,16 @@ func TestNewDataBlockArrCutter(t *testing.T){
 	// FROM:  DDDDD
 	// TO:    DDDDDDDDD
 	dataOrig = dataBlockArrCutter{
-		From:blockArr{
+		from:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
 			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
 		},
-		To:blockArr{
+		to:blockArr{
 			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
 			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
 		},
 	}
-	data = newDataBlockArrCutter(dataOrig.From, dataOrig.To)
+	data = newDataBlockArrCutter(dataOrig.from, dataOrig.to)
 	expectedBFrom = dataBlock{OriginOffset:100,DataOffset:200,Length:200}
 	expectedBTo = dataBlock{OriginOffset:100,DataOffset:550,Length:200}
 	expectedFromArr = blockArr{

@@ -84,7 +84,7 @@ func (arr blockArr) Swap(i, j int) {
 ВАЖНО - From и To портятся в процессе работы.
 */
 type dataBlockArrCutter struct {
-	From, To blockArr // Рабочие массивы, отсортированы по Originffset. ВАЖНО - портятся в процессе работы.
+	from, to blockArr // Рабочие массивы, отсортированы по Originffset. ВАЖНО - портятся в процессе работы.
 }
 
 /*
@@ -92,10 +92,10 @@ type dataBlockArrCutter struct {
  */
 func newDataBlockArrCutter(from, to blockArr) dataBlockArrCutter {
 	var res dataBlockArrCutter
-	res.From = make(blockArr, len(from))
-	res.To = make(blockArr, len(to))
-	copy(res.From, from)
-	copy(res.To, to)
+	res.from = make(blockArr, len(from))
+	res.to = make(blockArr, len(to))
+	copy(res.from, from)
+	copy(res.to, to)
 	return res
 }
 
@@ -111,48 +111,48 @@ func newDataBlockArrCutter(from, to blockArr) dataBlockArrCutter {
 */
 func (this *dataBlockArrCutter) Cut() (ok bool, bFrom, bTo dataBlock) {
 	switch {
-	case len(this.From) == 0 && len(this.To) == 0:
+	case len(this.from) == 0 && len(this.to) == 0:
 		return // возвращаем пустые данные
-	case len(this.From) == 0 && len(this.To) != 0:
+	case len(this.from) == 0 && len(this.to) != 0:
 		// EmptyFrom
 		ok = true
-		bTo = this.To[0]
-		this.To = this.To[1:]
+		bTo = this.to[0]
+		this.to = this.to[1:]
 		return
-	case len(this.From) != 0 && len(this.To) == 0:
+	case len(this.from) != 0 && len(this.to) == 0:
 		// Empty To
 		ok = true
-		bFrom = this.From[0]
-		this.From = this.From[1:]
+		bFrom = this.from[0]
+		this.from = this.from[1:]
 		return
 	default:
 		// pass
 	}
 
-	firstFrom := &this.From[0]
-	firstTo := &this.To[0]
+	firstFrom := &this.from[0]
+	firstTo := &this.to[0]
 
 	switch {
 	case firstFrom.Length == 0:
 		// firstFrom empty
-		this.From = this.From[1:]
+		this.from = this.from[1:]
 		return this.Cut()
 	case firstTo.Length == 0:
 		// firstTo empty
-		this.To = this.To[1:]
+		this.to = this.to[1:]
 		return this.Cut()
 
 	case firstFrom.OriginLast() <= firstTo.OriginOffset:
 		// firstFrom end before firstTo start
 		ok = true
 		bFrom = *firstFrom
-		this.From = this.From[1:]
+		this.from = this.from[1:]
 		return
 	case firstTo.OriginLast() <= firstFrom.OriginOffset:
 		// firstTo end before firstFromStart
 		ok = true
 		bTo = *firstTo
-		this.To = this.To[1:]
+		this.to = this.to[1:]
 		return
 
 	case firstFrom.OriginOffset < firstTo.OriginOffset:
@@ -176,14 +176,14 @@ func (this *dataBlockArrCutter) Cut() (ok bool, bFrom, bTo dataBlock) {
 			// firstFrom shorter then firstTo
 			ok = true
 			bFrom = *firstFrom
-			this.From = this.From[1:]
+			this.from = this.from[1:]
 			bTo, *firstTo = firstTo.Split(firstFrom.Length)
 			return
 		case firstTo.Length < firstFrom.Length:
 			// firstTo shorter then firstFrom
 			ok = true
 			bTo = *firstTo
-			this.To = this.To[1:]
+			this.to = this.to[1:]
 			bFrom, *firstFrom = firstFrom.Split(firstTo.Length)
 			return
 		case firstTo.Length == firstFrom.Length:
@@ -191,8 +191,8 @@ func (this *dataBlockArrCutter) Cut() (ok bool, bFrom, bTo dataBlock) {
 			ok = true
 			bFrom = *firstFrom
 			bTo = *firstTo
-			this.From = this.From[1:]
-			this.To = this.To[1:]
+			this.from = this.from[1:]
+			this.to = this.to[1:]
 			return
 		default:
 			panic(fmt.Errorf("Unhandled variant in cutHeader 2 %#v %#v:", *firstFrom, *firstTo))
