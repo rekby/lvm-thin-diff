@@ -88,6 +88,18 @@ type dataBlockArrCutter struct {
 }
 
 /*
+Создает структуру с КОПИЯМИ from и to, чтобы в процессе работы портились именно копии, а не основные массивы
+ */
+func newDataBlockArrCutter(from, to blockArr) dataBlockArrCutter {
+	var res dataBlockArrCutter
+	res.From = make(blockArr, len(from))
+	res.To = make(blockArr, len(to))
+	copy(res.From, from)
+	copy(res.To, to)
+	return res
+}
+
+/*
 ВАЖНО - массивы from, to ПОРТЯТСЯ в процессе работы. После вызова функции их можно использвоаться только для продолжения
 работы этой же функции.
 

@@ -377,6 +377,120 @@ func TestCutHead(t *testing.T){
 	}
 }
 
+func TestNewDataBlockArrCutter(t *testing.T){
+	// Test for work with dataCutter from newDataBlockArrCutter function doesn't
+	// broke original arrs
+
+	var data, dataOrig dataBlockArrCutter
+	var bFrom, bTo, expectedBFrom, expectedBTo dataBlock
+	var expectedFromArr, expectedToArr blockArr
+	var ok, expectedOk bool
+
+	equals := func(a,b blockArr)bool{
+		if len(a) != len(b){
+			return false
+		}
+		for i := range a{
+			if a[i] != b[i]{
+				return false
+			}
+		}
+		return true
+	}
+
+	isOk := func()(res bool){
+		res = true
+		if ok != expectedOk {
+			t.Errorf("ok: %#v != %#v", ok, expectedOk)
+			res = false
+		}
+		if bFrom != expectedBFrom {
+			t.Errorf("bFrom: %#v != %#v", bFrom, expectedBFrom)
+			res = false
+		}
+		if bTo != expectedBTo {
+			t.Errorf("bTo: %#v != %#v", bTo, expectedBTo)
+			res = false
+		}
+		if !equals(dataOrig.From, expectedFromArr) {
+			t.Errorf("newFrom: %#v != %#v", dataOrig.From, expectedFromArr)
+			res = false
+		}
+		if !equals(dataOrig.To, expectedToArr) {
+			t.Errorf("newTo: %#v != %#v", dataOrig.To, expectedToArr)
+			res = false
+		}
+		return res
+	}
+
+	if !isOk() {
+		t.Error()
+	}
+
+	expectedOk = true
+
+	// Equal start. firstFrom shorter then firstTo
+	// FROM:  DDDDD
+	// TO:    DDDDDDDDD
+	dataOrig = dataBlockArrCutter{
+		From:blockArr{
+			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
+			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
+		},
+		To:blockArr{
+			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
+			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
+		},
+	}
+	data = newDataBlockArrCutter(dataOrig.From, dataOrig.To)
+	expectedBFrom = dataBlock{OriginOffset:100,DataOffset:550,Length:200}
+	expectedBTo = dataBlock{OriginOffset:100,DataOffset:200,Length:200}
+	expectedFromArr = blockArr{
+		dataBlock{OriginOffset:100,DataOffset:550,Length:200},
+		dataBlock{OriginOffset:300,DataOffset:550,Length:250},
+	}
+	expectedToArr = blockArr{
+		dataBlock{OriginOffset:100,DataOffset:200,Length:300},
+		dataBlock{OriginOffset:400,DataOffset:500,Length:600},
+	}
+	ok, bFrom, bTo = data.Cut()
+
+	if !isOk(){
+		t.Error()
+	}
+
+	// Equal start. firstTo shorter then firstFrom
+	// FROM:  DDDDD
+	// TO:    DDDDDDDDD
+	dataOrig = dataBlockArrCutter{
+		From:blockArr{
+			dataBlock{OriginOffset:100,DataOffset:200,Length:300},
+			dataBlock{OriginOffset:400,DataOffset:500,Length:600},
+		},
+		To:blockArr{
+			dataBlock{OriginOffset:100,DataOffset:550,Length:200},
+			dataBlock{OriginOffset:300,DataOffset:550,Length:250},
+		},
+	}
+	data = newDataBlockArrCutter(dataOrig.From, dataOrig.To)
+	expectedBFrom = dataBlock{OriginOffset:100,DataOffset:200,Length:200}
+	expectedBTo = dataBlock{OriginOffset:100,DataOffset:550,Length:200}
+	expectedFromArr = blockArr{
+		dataBlock{OriginOffset:100,DataOffset:200,Length:300},
+		dataBlock{OriginOffset:400,DataOffset:500,Length:600},
+	}
+	expectedToArr = blockArr{
+		dataBlock{OriginOffset:100,DataOffset:550,Length:200},
+		dataBlock{OriginOffset:300,DataOffset:550,Length:250},
+	}
+	ok, bFrom, bTo = data.Cut()
+	if !isOk(){
+		t.Error()
+	}
+
+
+}
+
 func TestMakePatch(t *testing.T){
 	var diff, expectedDiff dataPatch
 
