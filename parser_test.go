@@ -28,6 +28,11 @@ func TestParser(t *testing.T){
     <range_mapping origin_begin="8191056" data_begin="8461529" length="9" time="5"/>
     <single_mapping origin_block="8191999" data_block="4146006" time="5"/>
   </device>
+  <device dev_id="2" mapped_blocks="40960001" transaction="1" creation_time="1" snap_time="1">
+    <single_mapping origin_block="1" data_block="1" time="1"/>
+    <range_mapping origin_begin="81909761" data_begin="84613261" length="801" time="53"/>
+    <range_mapping origin_begin="81910561" data_begin="84615291" length="91" time="52"/>
+  </device>
 </superblock>
 `
 	const blockSize = 128*512
@@ -37,7 +42,7 @@ func TestParser(t *testing.T){
 		t.Error(err)
 	}
 
-	if len(res) != 1 {
+	if len(res) != 2 {
 		t.Error()
 	}
 	dev := res[0]
@@ -68,4 +73,30 @@ func TestParser(t *testing.T){
 	if dev.Blocks[3] != b {
 		t.Error()
 	}
+
+	// DEV2
+	dev = res[1]
+	if dev.Id != 2 {
+		t.Error()
+	}
+
+	if len(dev.Blocks) != 3 {
+		t.Error()
+	}
+
+	b = dataBlock{OriginOffset:1*blockSize, DataOffset:1*blockSize, Length: blockSize}
+	if dev.Blocks[0] != b {
+		t.Error()
+	}
+
+	b = dataBlock{OriginOffset:81909761*blockSize, DataOffset:84613261*blockSize, Length: 801*blockSize}
+	if dev.Blocks[1] != b {
+		t.Error()
+	}
+
+	b = dataBlock{OriginOffset:81910561*blockSize, DataOffset:84615291*blockSize, Length:91*blockSize}
+	if dev.Blocks[2] != b {
+		t.Error()
+	}
+
 }

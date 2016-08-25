@@ -39,9 +39,10 @@ func (this *dataBlock) Split(length int64) (left, right dataBlock) {
 }
 
 type dataDevice struct {
-	Id     int
-	Blocks blockArr
-	Size   int64
+	Id        int
+	Blocks    blockArr
+	Size      int64 // Size of device in bytes
+	BlockSize int64
 }
 
 // Operation
@@ -49,7 +50,6 @@ const (
 	NONE = iota
 	WRITE
 	DELETE
-	SET_SIZE
 )
 
 type dataPatch struct {
@@ -89,7 +89,7 @@ type dataBlockArrCutter struct {
 
 /*
 Создает структуру с КОПИЯМИ from и to, чтобы в процессе работы портились именно копии, а не основные массивы
- */
+*/
 func newDataBlockArrCutter(from, to blockArr) dataBlockArrCutter {
 	var res dataBlockArrCutter
 	res.from = make(blockArr, len(from))
@@ -208,18 +208,18 @@ bFrom и bTo - два блока данных. Если оба блока не �
 быть равной длины.
 
 Пустой блок означает что в месте, указанном вторым блоком данных нет.
- */
+*/
 func makePatch(bFrom, bTo dataBlock) dataPatch {
 	if bFrom.IsEmpty() && bTo.IsEmpty() {
-		return dataPatch{Operation:NONE}
+		return dataPatch{Operation: NONE}
 	}
 
 	if bFrom.IsEmpty() {
-		return dataPatch{Offset:bTo.OriginOffset, Operation:WRITE, Length: bTo.Length}
+		return dataPatch{Offset: bTo.OriginOffset, Operation: WRITE, Length: bTo.Length}
 	}
 
 	if bTo.IsEmpty() {
-		return dataPatch{Offset:bFrom.OriginOffset, Operation:DELETE, Length:bFrom.Length}
+		return dataPatch{Offset: bFrom.OriginOffset, Operation: DELETE, Length: bFrom.Length}
 	}
 
 	if bFrom.OriginOffset != bTo.OriginOffset || bFrom.Length != bTo.Length {
@@ -227,8 +227,8 @@ func makePatch(bFrom, bTo dataBlock) dataPatch {
 	}
 
 	if bFrom.DataOffset == bTo.DataOffset {
-		return dataPatch{Operation:NONE} // Data is equal. Do nothing.
+		return dataPatch{Operation: NONE} // Data is equal. Do nothing.
 	}
 
-	return dataPatch{Offset:bTo.OriginOffset, Operation:WRITE, Length: bTo.Length}
+	return dataPatch{Offset: bTo.OriginOffset, Operation: WRITE, Length: bTo.Length}
 }
