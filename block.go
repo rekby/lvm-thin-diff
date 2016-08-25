@@ -41,8 +41,6 @@ func (this *dataBlock) Split(length int64) (left, right dataBlock) {
 type dataDevice struct {
 	Id        int
 	Blocks    blockArr
-	Size      int64 // Size of device in bytes
-	BlockSize int64
 }
 
 // Operation
@@ -200,35 +198,4 @@ func (this *dataBlockArrCutter) Cut() (ok bool, bFrom, bTo dataBlock) {
 	default:
 		panic(fmt.Errorf("Unhandled variant in cutHead: %#v %#v", *firstFrom, *firstTo))
 	}
-}
-
-/*
-Создать команду для патча данных from так чтобы получились данные to.
-bFrom и bTo - два блока данных. Если оба блока не пустые - то они должны начинаться с одного логического смещения и
-быть равной длины.
-
-Пустой блок означает что в месте, указанном вторым блоком данных нет.
-*/
-func makePatch(bFrom, bTo dataBlock) dataPatch {
-	if bFrom.IsEmpty() && bTo.IsEmpty() {
-		return dataPatch{Operation: NONE}
-	}
-
-	if bFrom.IsEmpty() {
-		return dataPatch{Offset: bTo.OriginOffset, Operation: WRITE, Length: bTo.Length}
-	}
-
-	if bTo.IsEmpty() {
-		return dataPatch{Offset: bFrom.OriginOffset, Operation: DELETE, Length: bFrom.Length}
-	}
-
-	if bFrom.OriginOffset != bTo.OriginOffset || bFrom.Length != bTo.Length {
-		panic("bFrom and bTo must have same start and length")
-	}
-
-	if bFrom.DataOffset == bTo.DataOffset {
-		return dataPatch{Operation: NONE} // Data is equal. Do nothing.
-	}
-
-	return dataPatch{Offset: bTo.OriginOffset, Operation: WRITE, Length: bTo.Length}
 }
