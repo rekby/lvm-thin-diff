@@ -6,6 +6,8 @@ import (
 	"os"
 	"io"
 	"encoding/gob"
+	"time"
+	"log"
 )
 
 const (
@@ -19,14 +21,44 @@ var (
 	FromDevId = flag.Int("from-dev-id", 0, "DevID of old snapshot")
 	ToDevId = flag.Int("to-dev-id", 0, "DevID of new snapshot")
 	DataFile = flag.String("data-file", "", "path to device or file with underliing data")
+	CacheFile = flag.String("cache-file", "", "use file for cache tmp calcs, for example xml parse")
+)
+
+var (
+	globalCache struct{
+		MetadataTimeStamp *time.Time
+		Devices           []dataDevice
+	}
 )
 
 func Main(){
 	flag.Parse()
 
+	if *CacheFile != "" {
+		f, _ := os.Open(*CacheFile)
+		errLocal := gob.NewDecoder(f).Decode(&globalCache)
+		f.Close()
+		if errLocal == nil {
+			log.Println("Cache loaded OK")
+		} else {
+			log.Println("Cache load error:", errLocal)
+		}
+	}
+
 	switch strings.ToLower(*Operation) {
 	case "makediff":
 		makeDiff()
+	}
+
+	if *CacheFile != "" {
+		f, _ := os.OpenFile(*CacheFile, os.O_CREATE | os.O_WRONLY, 0600)
+		errLocal := gob.NewEncoder(f).Encode(globalCache)
+		f.Close()
+		if errLocal == nil {
+			log.Println("Cache saved OK")
+		} else {
+			log.Println("Cache save error:", errLocal)
+		}
 	}
 }
 
@@ -50,15 +82,31 @@ func makeDiff(){
 		panic(err)
 	}
 
-	f, err := os.Open(*MetadataDumpFile)
-
-	if err != nil {
-		panic(err)
+	var devices []dataDevice = nil
+	if globalCache.MetadataTimeStamp != nil && len(globalCache.Devices) > 0 {
+		stat, _ := os.Stat(*MetadataDumpFile)
+		if stat.ModTime() == *globalCache.MetadataTimeStamp {
+			devices = globalCache.Devices
+			log.Println("Load devices from cache", len(devices))
+		}
 	}
+	if devices == nil {
+		log.Println("Parse xml metadata")
+		f, err := os.Open(*MetadataDumpFile)
 
-	devices, err := parseMetaDataXML(f)
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
+
+		devices, err = parseMetaDataXML(f)
+		if err != nil {
+			panic(err)
+		}
+
+		stat, _ := os.Stat(*MetadataDumpFile)
+		statTime := stat.ModTime()
+		globalCache.MetadataTimeStamp = &statTime
+		globalCache.Devices = devices
 	}
 
 	var from, to dataDevice
